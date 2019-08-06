@@ -103,7 +103,6 @@ def play():
                 
                 break
 
-
 def place_mine(s):
     """place_mine()
     args:
@@ -202,7 +201,7 @@ def reveal(r,c,k,s):
             return reveal_surrounding(r,c,k,s)
 
         return k, ' '
-        
+
 def reveal_surrounding(r,c,k,s):
     """get_info()
     args:
