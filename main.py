@@ -49,6 +49,7 @@ def final(status):
     args:
         status: textready to be printed (f"You {status}!")
     """
+    print()
     cprint(f"You {status}!", 'red')
     reset()
 
@@ -70,6 +71,7 @@ def play():
             if s[r][c] == '*':
                 s = update_number(r, c, s)
 
+    # playing loop
     while True:
         # render map
         render_map(k)
@@ -85,6 +87,9 @@ def play():
             # check what will happen next
             r,c,action = validate_input(chosen)
             if action == "invalid":
+                break
+            elif action == 'cheat':
+                k = cheat(s,k)
                 break
             elif action == "mark":
                 k = marker(r,c,k)
@@ -124,42 +129,12 @@ def update_number(r, c, s):
     return:
         the new list with new bomb
     """
-
-    # row above
-    if r - 1 > -1:
-
-        if c - 1 > -1:
-            if s[r-1][c-1] != '*':
-                s[r-1][c-1] += 1
-
-        if s[r-1][c] != '*':
-            s[r-1][c] += 1
-
-        if c + 1 < 9:
-            if s[r-1][c+1] != '*':
-                s[r-1][c+1] += 1
-
-    # same row
-    if c - 1 > -1:
-        if s[r][c-1] != '*':
-            s[r][c-1] += 1
-
-    if c + 1 < 9:
-        if s[r][c+1] != '*':
-            s[r][c+1] += 1
-
-    # row below
-    if r + 1 < 9:
-        if c - 1 > -1:
-            if s[r+1][c-1] != '*':
-                s[r+1][c-1] += 1
-
-        if s[r+1][c] != '*':
-            s[r+1][c] += 1
-
-        if c + 1 < 9:
-            if s[r+1][c+1] != '*':
-                s[r+1][c+1] += 1
+    
+    for tr in range(r-1, r+2):
+        for tc in range(c-1, c+2):
+            if tr in range(9) and tc in range(9):
+                if s[tr][tc] != '*':
+                    s[tr][tc] += 1
 
     # return the new solution grid
     return s
@@ -238,11 +213,10 @@ def reveal_surrounding(r,c,k,s):
     return:
         k: new known grid
     """
-    numbers = range(9)
 
     for tr in range(r-1, r+2):
         for tc in range(c-1, c+2):
-            if tr in numbers and tc in numbers:
+            if tr in range(9) and tc in range(9):
 
                 if get_info(tr, tc, s)  == 0 and k[tr][tc] != 0:
                     k[tr][tc] = get_info(tr, tc, s)
@@ -272,6 +246,8 @@ def validate_input(chosen):
         elif len(chosen) == 2 and chosen[0].lower() in letters and int(chosen[1]) in numbers:
             r,c = (int(chosen[1]), letters.index(chosen[0].lower()))
             return r,c,'rev'
+        elif chosen == 'cheat':
+            return 0,0,'cheat'
         else:
             return 0,0,'invalid'
     except:
@@ -302,6 +278,22 @@ def check_win(s,k):
     else:
         return False
 
+def cheat(s,k):
+    """cheat()
+    args:
+        s:solution grid
+        k:known grid
+    return:
+        k:new known(conpleted) grid
+    """
+    for r in range(9):
+        for c in range(9):
+            if s[r][c] != '*':
+                k[r][c] = get_info(r,c,s)
+            else:
+                k[r][c] = '⚐'
+
+    return k
 
 if __name__ == "__main__":
     welcome()
